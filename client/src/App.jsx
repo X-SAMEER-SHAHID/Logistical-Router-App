@@ -1,100 +1,87 @@
 import React from 'react';
-import { useRoutingData } from './hooks/useRoutingData';
-import TripInputForm from './components/TripInputForm';
-import RouteMap from './components/RouteMap';
-import LogSheetViewer from './components/LogSheetViewer';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import LoadingSpinner from './components/LoadingSpinner';
+import Home from './components/Home';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Dashboard from './components/Dashboard';
+import TripDetail from './components/TripDetail';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
-    const { isLoading, error, data, submitTrip, resetData } = useRoutingData();
+    const { user, logout, loading } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
+    };
+
+    if (loading) return <LoadingSpinner message="Initializing Logistics Router..." />;
 
     return (
-        <div className="min-h-screen bg-gray-50 text-gray-900 font-sans selection:bg-blue-200">
-            {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2 cursor-pointer" onClick={resetData}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                        </svg>
-                        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-                            Logistics Router
-                        </h1>
+        <div className="min-h-screen bg-background font-body-md text-on-background antialiased overflow-x-hidden flex flex-col">
+            {/* Header / Navbar */}
+            <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/50 top-0 sticky z-50 shadow-[0_10px_30px_rgba(15,23,42,0.05)] font-manrope tracking-tight">
+                <div className="flex justify-between items-center w-full px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto gap-2">
+                    <Link to="/" className="text-base sm:text-xl font-extrabold text-primary tracking-tighter flex items-center gap-1 sm:gap-2 shrink-0 max-w-[150px] sm:max-w-none">
+                        <span className="material-symbols-outlined text-secondary text-xl sm:text-2xl shrink-0">route</span>
+                        <span className="truncate leading-tight">Logistics Router</span>
+                    </Link>
+
+                    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                        {user ? (
+                            <>
+                                <Link to="/dashboard" className="text-on-surface-variant font-medium hover:text-secondary transition-colors text-sm sm:text-base">Dashboard</Link>
+                                <button onClick={handleLogout} className="p-1.5 sm:p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all flex items-center justify-center group" title="Logout">
+                                    <span className="material-symbols-outlined text-xl sm:text-2xl group-hover:text-error transition-colors">logout</span>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className="text-on-surface-variant font-medium hover:text-secondary transition-colors text-sm sm:text-base">Log In</Link>
+                                <Link to="/signup" className="bg-gradient-to-r from-secondary to-on-secondary-fixed-variant text-on-secondary px-3 py-1.5 sm:px-6 sm:py-2 rounded-full text-xs sm:text-base font-semibold shadow-lg shadow-secondary/20 hover:shadow-xl active:scale-95 transition-all duration-150 whitespace-nowrap">
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                
-                {/* Input Phase */}
-                {!data && (
-                    <div className="flex flex-col items-center justify-center min-h-[70vh] animate-in fade-in zoom-in duration-500">
-                        <div className="text-center mb-8 max-w-2xl">
-                            <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
-                                Intelligent Routing & ELD
-                            </h2>
-                            <p className="text-lg text-gray-600">
-                                Enter your trip details below. We'll calculate the optimal route, enforce Hours of Service (HOS) rules, and generate compliant log sheets automatically.
-                            </p>
-                        </div>
-                        <TripInputForm onSubmit={submitTrip} isLoading={isLoading} error={error} />
-                    </div>
-                )}
-
-                {/* Loading State */}
-                {isLoading && (
-                    <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-40 flex flex-col items-center justify-center">
-                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
-                        <p className="text-xl font-medium text-gray-800 animate-pulse">Calculating optimal route and log sheets...</p>
-                    </div>
-                )}
-
-                {/* Results Phase */}
-                {data && !isLoading && (
-                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800">Trip Overview</h2>
-                            <button 
-                                onClick={resetData}
-                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition-colors"
-                            >
-                                Plan Another Trip
-                            </button>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2">
-                                <RouteMap data={data} />
-                            </div>
-                            
-                            <div className="lg:col-span-1 space-y-6">
-                                <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-                                    <h3 className="font-bold text-lg border-b pb-2 mb-4">HOS Summary</h3>
-                                    <ul className="space-y-3">
-                                        <li className="flex justify-between items-center">
-                                            <span className="text-gray-600">Total Distance</span>
-                                            <span className="font-semibold">{data.total_distance?.toFixed(1)} mi</span>
-                                        </li>
-                                        <li className="flex justify-between items-center">
-                                            <span className="text-gray-600">Total Duration</span>
-                                            <span className="font-semibold">{data.total_duration?.toFixed(1)} hrs</span>
-                                        </li>
-                                        <li className="flex justify-between items-center text-blue-600">
-                                            <span>Days Required</span>
-                                            <span className="font-bold">{data.events ? new Set(data.events.map(e => e.day)).size : 1}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        {data.events && data.events.length > 0 && (
-                            <LogSheetViewer events={data.events} />
-                        )}
-                    </div>
-                )}
-
+            {/* Main Content Area */}
+            <main className="flex-grow w-full relative">
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/dashboard" element={
+                        user ? <Dashboard /> : <Login />
+                    } />
+                    <Route path="/trip/:id" element={
+                        user ? <TripDetail /> : <Login />
+                    } />
+                </Routes>
             </main>
+
+            {/* Footer */}
+            <footer className="bg-surface-container-low border-t border-outline-variant w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full px-8 py-12 max-w-7xl mx-auto">
+                    <div>
+                        <div className="text-lg font-bold text-primary mb-4 font-manrope">Logistics Router</div>
+                        <p className="font-body-sm text-on-surface-variant max-w-xs mb-6">
+                            The global standard for intelligent logistics orchestration and supply chain visibility.
+                        </p>
+                        <div className="text-on-surface-variant text-sm">
+                            © 2026 Logistics Router Inc.
+                        </div>
+                    </div>
+                    <div className="flex gap-x-8 md:justify-end">
+                        <a className="font-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+                        <a className="font-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }
