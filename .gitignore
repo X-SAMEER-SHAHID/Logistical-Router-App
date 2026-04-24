@@ -1,0 +1,8 @@
+# Ignore generated media files
+server/media/log_sheets/
+server/db.sqlite3
+server/venv/
+client/node_modules/
+.DS_Store
+__pycache__/
+*.pyc

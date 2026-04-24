@@ -16,9 +16,3 @@ class RoutePlan(models.Model):
     total_duration = models.FloatField() # in hours
     polyline = models.TextField(blank=True, null=True) # JSON or encoded string
     created_at = models.DateTimeField(auto_now_add=True)
-
-class LogSheet(models.Model):
-    route_plan = models.ForeignKey(RoutePlan, on_delete=models.CASCADE, related_name='log_sheets')
-    day_number = models.IntegerField()
-    image = models.ImageField(upload_to='log_sheets/')
-    created_at = models.DateTimeField(auto_now_add=True)

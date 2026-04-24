@@ -3,11 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 
-from .models import TripRequest, RoutePlan, LogSheet
+from .models import TripRequest, RoutePlan
 from .serializers import RoutePlanSerializer
 from .utils.routing import get_full_route
 from .utils.hos_calculator import HOSCalculator
-from .utils.image_generator import generate_log_sheet
 
 class CalculateTripView(APIView):
     def post(self, request):
@@ -46,17 +45,7 @@ class CalculateTripView(APIView):
             hos = HOSCalculator(current_cycle_used)
             events = hos.process_trip(total_distance, total_duration)
 
-            # 4. Generate Images
-            days = set(event['day'] for event in events)
-            for day in days:
-                image_path = generate_log_sheet(day, events, route_plan.id)
-                LogSheet.objects.create(
-                    route_plan=route_plan,
-                    day_number=day,
-                    image=image_path
-                )
-
-            # 5. Return Response
+            # 4. Return Response
             serializer = RoutePlanSerializer(route_plan)
             
             response_data = serializer.data

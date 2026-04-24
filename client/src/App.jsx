@@ -81,15 +81,15 @@ function App() {
                                         </li>
                                         <li className="flex justify-between items-center text-blue-600">
                                             <span>Days Required</span>
-                                            <span className="font-bold">{data.log_sheets?.length || 1}</span>
+                                            <span className="font-bold">{data.events ? new Set(data.events.map(e => e.day)).size : 1}</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
-                        {data.log_sheets && data.log_sheets.length > 0 && (
-                            <LogSheetViewer logSheets={data.log_sheets} />
+                        {data.events && data.events.length > 0 && (
+                            <LogSheetViewer events={data.events} />
                         )}
                     </div>
                 )}
