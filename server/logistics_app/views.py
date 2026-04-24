@@ -10,10 +10,13 @@ from .utils.routing import get_full_route
 from .utils.hos_calculator import HOSCalculator
 from rest_framework.permissions import IsAuthenticated
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+    callback_url = 'https://logistical-router-app.vercel.app'
+    client_class = OAuth2Client
 
 class MyTripsView(APIView):
     permission_classes = [IsAuthenticated]
