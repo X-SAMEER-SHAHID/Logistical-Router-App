@@ -9,14 +9,102 @@ from .serializers import RoutePlanSerializer
 from .utils.routing import get_full_route
 from .utils.hos_calculator import HOSCalculator
 from rest_framework.permissions import IsAuthenticated
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
+import requests as http_requests
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
 
-class GoogleLogin(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    callback_url = 'https://logistical-router-app.vercel.app'
-    client_class = OAuth2Client
+User = get_user_model()
+
+class GoogleLoginView(APIView):
+    """Custom Google login that handles Google Identity Services JWT tokens."""
+    
+    def post(self, request):
+        credential = request.data.get('id_token') or request.data.get('access_token')
+        
+        if not credential:
+            return Response(
+                {"error": "No Google credential provided"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Verify the token with Google's tokeninfo endpoint
+            google_response = http_requests.get(
+                f'https://oauth2.googleapis.com/tokeninfo?id_token={credential}'
+            )
+            
+            if google_response.status_code != 200:
+                return Response(
+                    {"error": "Invalid Google token"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            google_data = google_response.json()
+            
+            # Verify the token is for our app
+            expected_client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
+            if google_data.get('aud') != expected_client_id:
+                return Response(
+                    {"error": "Token not intended for this app"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            email = google_data.get('email')
+            if not email:
+                return Response(
+                    {"error": "No email in Google token"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get or create user
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email,
+                    'first_name': google_data.get('given_name', ''),
+                    'last_name': google_data.get('family_name', ''),
+                }
+            )
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
+            response = Response({
+                'user': {
+                    'pk': user.pk,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                },
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            }, status=status.HTTP_200_OK)
+            
+            # Set JWT cookies (matching dj-rest-auth cookie settings)
+            response.set_cookie(
+                'auth_cookie',
+                str(refresh.access_token),
+                httponly=True,
+                samesite='None',
+                secure=True,
+                max_age=3600,
+            )
+            response.set_cookie(
+                'refresh_cookie',
+                str(refresh),
+                httponly=True,
+                samesite='None',
+                secure=True,
+                max_age=7 * 24 * 3600,
+            )
+            
+            return response
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Google authentication failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class MyTripsView(APIView):
     permission_classes = [IsAuthenticated]
