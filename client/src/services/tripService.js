@@ -3,7 +3,7 @@ import axios from 'axios';
 // Ensure cookies are sent with every request
 axios.defaults.withCredentials = true;
 
-const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8000/api/v1`;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 // Axios Interceptor for seamless JWT Token Refresh
 axios.interceptors.response.use(
@@ -14,7 +14,7 @@ axios.interceptors.response.use(
         // If the error is 401 Unauthorized and we haven't retried yet
         // (and it's not a login or refresh request itself)
         if (
-            error.response?.status === 401 && 
+            error.response?.status === 401 &&
             !originalRequest._retry &&
             !originalRequest.url.includes('/auth/login') &&
             !originalRequest.url.includes('/auth/token/refresh')
@@ -23,7 +23,7 @@ axios.interceptors.response.use(
             try {
                 // The refresh token is in an HttpOnly cookie, so we just hit the endpoint
                 await axios.post(`${API_URL}/auth/token/refresh/`);
-                
+
                 // If successful, the new access token cookie is set!
                 // We can now retry the original request
                 return axios(originalRequest);
