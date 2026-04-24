@@ -32,7 +32,9 @@ const Login = () => {
             await googleLogin(credentialResponse.credential);
             navigate('/dashboard');
         } catch (err) {
-            setError('Failed to log in with Google.');
+            console.error("Google login error:", err);
+            const backendError = err.response?.data?.error;
+            setError(backendError || 'Failed to log in with Google.');
         } finally {
             setIsLoading(false);
         }

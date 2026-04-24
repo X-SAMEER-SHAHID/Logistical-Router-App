@@ -46,7 +46,9 @@ const Signup = () => {
             await googleLogin(credentialResponse.credential);
             navigate('/dashboard');
         } catch (err) {
-            setError('Failed to sign up with Google.');
+            console.error("Google login error:", err);
+            const backendError = err.response?.data?.error;
+            setError(backendError || 'Failed to sign up with Google.');
         } finally {
             setIsLoading(false);
         }

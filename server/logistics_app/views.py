@@ -42,7 +42,7 @@ class GoogleLoginView(APIView):
             google_data = google_response.json()
             
             # Verify the token is for our app
-            expected_client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
+            expected_client_id = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
             if google_data.get('aud') != expected_client_id:
                 return Response(
                     {"error": "Token not intended for this app"},
