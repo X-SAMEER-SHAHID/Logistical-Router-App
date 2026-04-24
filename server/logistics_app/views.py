@@ -45,7 +45,7 @@ class GoogleLoginView(APIView):
             expected_client_id = os.environ.get('GOOGLE_CLIENT_ID', '').strip()
             if google_data.get('aud') != expected_client_id:
                 return Response(
-                    {"error": "Token not intended for this app"},
+                    {"error": f"Token not intended for this app. Expected: '{expected_client_id}', Got: '{google_data.get('aud')}'"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
