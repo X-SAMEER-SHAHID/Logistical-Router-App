@@ -1,6 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class TripRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='trips')
     current_loc = models.CharField(max_length=255)
     pickup_loc = models.CharField(max_length=255)
     dropoff_loc = models.CharField(max_length=255)

@@ -26,57 +26,50 @@ const LogSheetViewer = ({ events }) => {
     const currentDay = days[currentIndex];
 
     return (
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 mt-8">
-            <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                <h3 className="font-bold text-gray-800">Generated Log Sheets (HOS)</h3>
-                <div className="text-sm text-gray-600 bg-gray-200 px-3 py-1 rounded-full">
+        <div className="w-full">
+            <div className="p-4 bg-surface-bright rounded-2xl flex justify-between items-center mb-4">
+                <span className="font-title-sm text-title-sm text-on-surface">Daily View</span>
+                <div className="text-label-caps font-label-caps text-on-secondary-fixed bg-secondary-fixed px-3 py-1 rounded-full uppercase">
                     Day {currentDay} of {days.length}
                 </div>
             </div>
             
-            <div className="p-6">
-                <div className="relative group rounded-xl overflow-hidden bg-white border border-gray-200 flex justify-center items-center p-4 min-h-[300px]">
-                    
-                    <div className="w-full h-full overflow-x-auto">
-                        <LogSheetSVG dayNumber={currentDay} events={events} />
-                    </div>
-                    
-                    {days.length > 1 && (
-                        <>
-                            <button 
-                                onClick={prevSlide}
-                                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-50 group-hover:opacity-100 transition-opacity z-10"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
-                            <button 
-                                onClick={nextSlide}
-                                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-50 group-hover:opacity-100 transition-opacity z-10"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </>
-                    )}
+            <div className="relative group rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/30 flex justify-center items-center p-4 min-h-[300px]">
+                <div className="w-full h-full overflow-x-auto">
+                    <LogSheetSVG dayNumber={currentDay} events={events} />
                 </div>
                 
                 {days.length > 1 && (
-                    <div className="flex justify-center mt-4 space-x-2">
-                        {days.map((_, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setCurrentIndex(idx)}
-                                className={`w-3 h-3 rounded-full transition-colors ${
-                                    idx === currentIndex ? 'bg-blue-600' : 'bg-gray-300 hover:bg-gray-400'
-                                }`}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <button 
+                            onClick={prevSlide}
+                            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-surface hover:bg-surface-variant text-on-surface p-2 rounded-full shadow-lg opacity-50 group-hover:opacity-100 transition-opacity z-10"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                        </button>
+                        <button 
+                            onClick={nextSlide}
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-surface hover:bg-surface-variant text-on-surface p-2 rounded-full shadow-lg opacity-50 group-hover:opacity-100 transition-opacity z-10"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                        </button>
+                    </>
                 )}
             </div>
+            
+            {days.length > 1 && (
+                <div className="flex justify-center mt-6 space-x-2">
+                    {days.map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setCurrentIndex(idx)}
+                            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                                idx === currentIndex ? 'bg-secondary w-6' : 'bg-outline-variant hover:bg-outline'
+                            }`}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
