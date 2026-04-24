@@ -66,6 +66,16 @@ class GoogleLoginView(APIView):
                 }
             )
             
+            # Keep allauth EmailAddress table in sync
+            from allauth.account.models import EmailAddress
+            if created or not EmailAddress.objects.filter(user=user).exists():
+                EmailAddress.objects.create(
+                    user=user,
+                    email=email,
+                    verified=True,
+                    primary=True
+                )
+            
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             
