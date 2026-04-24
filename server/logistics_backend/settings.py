@@ -150,7 +150,15 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE': 'auth_cookie',
     'JWT_AUTH_REFRESH_COOKIE': 'refresh_cookie',
     'JWT_AUTH_HTTPONLY': True,
+    'JWT_AUTH_SAMESITE': 'None',
+    'JWT_AUTH_SECURE': True,
 }
+
+# Cross-Site Cookie Settings (required for Vercel -> Render)
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
 
 from datetime import timedelta
 SIMPLE_JWT = {
