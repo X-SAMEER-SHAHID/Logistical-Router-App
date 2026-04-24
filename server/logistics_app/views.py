@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import json
+import os
 
 from .models import TripRequest, RoutePlan
 from .serializers import RoutePlanSerializer
@@ -14,7 +15,7 @@ from dj_rest_auth.registration.views import SocialLoginView
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = "http://localhost:5173"
+    callback_url = os.environ.get('GOOGLE_CALLBACK_URL', 'https://logistical-router-app.vercel.app')
     client_class = OAuth2Client
 
 class MyTripsView(APIView):

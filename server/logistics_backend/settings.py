@@ -76,13 +76,13 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    # "https://logistical-router-app.onrender.com",
-    # "https://your-vercel-app-url.vercel.app",
+    "https://logistical-router-app.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://logistical-router-app.vercel.app",
 ]
 
 ROOT_URLCONF = 'logistics_backend.urls'
